@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinguaSphere - Professional English Academy & TOEFL Simulator</title>
+    <meta name="description" content="Platform pembelajaran Bahasa Inggris terstruktur dari tingkat Basic (A1) hingga Advanced (C1), dilengkapi Tes Penempatan Kemampuan CEFR dan Simulator Ujian TOEFL ITP resmi.">
+    
+    <!-- Google Fonts: Outfit & Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="app-sidebar" id="app-sidebar">
+            <div class="brand-wrapper">
+                <img src="assets/logo.svg" alt="LinguaSphere Academy Monogram" class="brand-logo-img">
+                <div class="brand-text">
+                    <h1>LinguaSphere</h1>
+                    <span>English Academy</span>
+                </div>
+            </div>
+
+            <nav class="nav-menu">
+                <button class="nav-item-btn active" data-view="path-view" id="nav-learn-btn">
+                    <span class="nav-icon">📚</span>
+                    <span>Kurikulum Belajar</span>
+                </button>
+                <button class="nav-item-btn" data-view="placement-view" id="nav-placement-btn">
+                    <span class="nav-icon">🎯</span>
+                    <span>Tes Penempatan</span>
+                </button>
+                <button class="nav-item-btn" data-view="toefl-view" id="nav-toefl-btn">
+                    <span class="nav-icon">📝</span>
+                    <span>Simulasi TOEFL</span>
+                </button>
+                <button class="nav-item-btn" data-view="vocab-view" id="nav-vocab-btn">
+                    <span class="nav-icon">🗂️</span>
+                    <span>Flashcards Kosakata</span>
+                </button>
+                <button class="nav-item-btn" data-view="profile-view" id="nav-profile-btn">
+                    <span class="nav-icon">👤</span>
+                    <span>Profil & Analitik</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="theme-toggle-btn" id="btn-toggle-theme" title="Ganti Tampilan">
+                    <span id="theme-icon">🌙</span>
+                    <span id="theme-label">Mode Gelap</span>
+                </button>
+                <button class="theme-toggle-btn" id="btn-toggle-sound" title="Pengaturan Audio">
+                    <span id="sound-icon">🔊</span>
+                    <span id="sound-label">Audio: Aktif</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="main-wrapper">
+            <!-- Top Sticky Status Bar -->
+            <header class="top-bar">
+                <div class="current-track-info">
+                    <span class="track-badge">Global English Program</span>
+                    <strong style="font-size: 0.95rem; font-weight: 700;" id="current-course-badge">CEFR Standard</strong>
+                </div>
+
+                <div class="top-bar-stats">
+                    <div class="stat-pill stat-streak" title="Hari berturut-turut belajar">
+                        <span>🔥</span>
+                        <span id="top-streak-count">1 Hari</span>
+                    </div>
+
+                    <div class="stat-pill stat-gems" title="Total Poin XP">
+                        <span>✨</span>
+                        <span id="top-xp-count">0 XP</span>
+                    </div>
+
+                    <div class="stat-pill stat-level" id="stat-level-pill">
+                        <span id="top-cefr-badge">Tingkat A1</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-body">
+                
+                <!-- ==========================================
+                     VIEW 1: COURSE SYLLABUS & CURRICULUM
+                     ========================================== -->
+                <section class="view-panel active" id="path-view">
+                    <div class="course-hero-card">
+                        <div class="course-hero-content">
+                            <span style="font-size: 0.85rem; font-weight: 700; color: #818cf8; text-transform: uppercase; letter-spacing: 0.5px;">Kurikulum Berjenjang</span>
+                            <h2 id="path-level-title">Level 1: Basic (A1 Pemula)</h2>
+                            <p id="path-level-desc">Fondasi penting: perkenalan, kata ganti, benda sehari-hari, dan kalimat rutin dasar.</p>
+                        </div>
+                        <button class="btn-modern btn-accent" id="btn-quick-placement-prompt">
+                            🎯 Tes Penempatan CEFR
+                        </button>
+                    </div>
+
+                    <!-- Level Selector Tabs -->
+                    <div class="level-tabs-bar" id="level-tabs-container">
+                        <!-- Rendered dynamically -->
+                    </div>
+
+                    <!-- Course Units Syllabus Cards -->
+                    <div id="units-container">
+                        <!-- Injected via JavaScript -->
+                    </div>
+                </section>
+
+                <!-- ==========================================
+                     VIEW 2: DIAGNOSTIC / PLACEMENT TEST
+                     ========================================== -->
+                <section class="view-panel" id="placement-view">
+                    <!-- Intro screen -->
+                    <div class="placement-intro-card" id="placement-intro-screen">
+                        <span style="font-size: 2.8rem; display: block; margin-bottom: 12px;">🎯</span>
+                        <h2 style="font-size: 1.8rem; margin-bottom: 8px;">Tes Penempatan Kemampuan Bahasa Inggris</h2>
+                        <p style="color: var(--text-secondary); font-size: 0.98rem; max-width: 580px; margin: 0 auto;">
+                            Evaluasi akurat kemampuan bahasa Inggris Anda berdasarkan standar <strong>CEFR (A1 - C1)</strong> melalui 15 butir soal komprehensif mencakup Grammar, Vocabulary, Reading, dan Listening.
+                        </p>
+
+                        <div class="placement-features">
+                            <div class="feature-box">
+                                <div class="feat-icon">⏱️</div>
+                                <h5>10 - 15 Menit</h5>
+                                <p>Efektif & terstruktur</p>
+                            </div>
+                            <div class="feature-box">
+                                <div class="feat-icon">🎧</div>
+                                <h5>Audio Listening</h5>
+                                <p>Pengucapan standar native</p>
+                            </div>
+                            <div class="feature-box">
+                                <div class="feat-icon">🔓</div>
+                                <h5>Penempatan Otomatis</h5>
+                                <p>Buka modul yang sesuai</p>
+                            </div>
+                        </div>
+
+                        <button class="btn-modern btn-primary" id="btn-start-placement" style="font-size: 1.05rem; padding: 12px 28px;">
+                            Mulai Tes Penempatan Sekarang ➔
+                        </button>
+                    </div>
+
+                    <!-- Active Test Runner -->
+                    <div class="unit-syllabus-card" id="placement-runner" style="display: none; padding: 36px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <span class="exercise-category-tag" id="placement-q-category">Basic Grammar (A1)</span>
+                            <span style="font-weight: 700; color: var(--text-muted); font-size: 0.9rem;" id="placement-q-counter">Soal 1 dari 15</span>
+                        </div>
+
+                        <div class="exercise-progress-container" style="margin-bottom: 24px;">
+                            <div class="exercise-progress-bar" id="placement-progress-bar" style="width: 7%;"></div>
+                        </div>
+
+                        <!-- Audio Box if has audio -->
+                        <div id="placement-audio-box" style="display: none; margin-bottom: 20px;">
+                            <div class="audio-player-bar">
+                                <button class="btn-audio-circle" id="btn-placement-listen" title="Dengarkan Audio">🔊</button>
+                                <button class="btn-modern btn-outline" id="btn-placement-slow" style="padding: 6px 12px; font-size: 0.82rem;">🐢 Lambat</button>
+                                <span style="font-size: 0.88rem; color: var(--text-secondary); font-weight: 600;">Klik untuk mendengarkan audio rekaman</span>
+                            </div>
+                        </div>
+
+                        <div class="prompt-card" id="placement-prompt-text">
+                            Question prompt goes here...
+                        </div>
+
+                        <div class="choice-grid" id="placement-options-container">
+                            <!-- Options injected dynamically -->
+                        </div>
+
+                        <div style="display: flex; justify-content: flex-end; margin-top: 28px;">
+                            <button class="btn-modern btn-primary" id="btn-next-placement" disabled>
+                                Lanjut ke Soal Berikutnya ➔
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Result Report Card -->
+                    <div class="result-report-card" id="placement-result-screen" style="display: none;">
+                        <div class="report-hero">
+                            <span style="font-size: 2.8rem; display: block; margin-bottom: 12px;" id="rep-badge-emoji">🏆</span>
+                            <div class="cefr-badge-large" id="rep-cefr-badge" style="background: var(--primary);">
+                                CEFR B1 - Intermediate
+                            </div>
+                            <h3 id="rep-level-name" style="font-size: 1.5rem; margin-bottom: 6px;">Level 3: Intermediate (Menengah)</h3>
+                            <p id="rep-description" style="color: var(--text-secondary); font-size: 0.95rem; max-width: 600px; margin: 0 auto;">
+                                Deskripsi hasil evaluasi kemampuan bahasa Inggris.
+                            </p>
+                        </div>
+
+                        <div class="score-progress-display">
+                            <div class="metric-circle">
+                                <div class="val" id="rep-score-val">12 / 15</div>
+                                <div class="lbl">Jawaban Benar</div>
+                            </div>
+                            <div class="metric-circle">
+                                <div class="val" id="rep-percent-val" style="color: var(--accent-cyan);">80%</div>
+                                <div class="lbl">Akurasi</div>
+                            </div>
+                            <div class="metric-circle">
+                                <div class="val" style="color: var(--warning);">+40 XP</div>
+                                <div class="lbl">Bonus Tes</div>
+                            </div>
+                        </div>
+
+                        <div style="background: var(--bg-surface-alt); border-radius: var(--radius-md); padding: 22px; margin-bottom: 24px; border: 1px solid var(--border-color);">
+                            <h4 style="margin-bottom: 8px; font-size: 0.95rem; color: var(--success); display: flex; align-items: center; gap: 8px;">
+                                <span>✓</span> Kekuatan Gramatikal:
+                            </h4>
+                            <p id="rep-strengths" style="color: var(--text-secondary); font-size: 0.92rem; margin-bottom: 16px;"></p>
+
+                            <h4 style="margin-bottom: 8px; font-size: 0.95rem; color: var(--warning); display: flex; align-items: center; gap: 8px;">
+                                <span>⚡</span> Rekomendasi Peningkatan:
+                            </h4>
+                            <p id="rep-areas" style="color: var(--text-secondary); font-size: 0.92rem;"></p>
+                        </div>
+
+                        <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;">
+                            <button class="btn-modern btn-primary" id="btn-jump-to-recommended">
+                                Mulai Belajar di Tingkat Ini ➔
+                            </button>
+                            <button class="btn-modern btn-outline" id="btn-retake-placement">
+                                Ulangi Tes 🔄
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==========================================
+                     VIEW 3: TOEFL PRACTICE SIMULATOR
+                     ========================================== -->
+                <section class="view-panel" id="toefl-view">
+                    <!-- Intro Dashboard -->
+                    <div id="toefl-dashboard-screen">
+                        <div class="toefl-intro-banner">
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                <span style="background: #3b82f6; color: #ffffff; font-weight: 700; font-size: 0.76rem; padding: 3px 8px; border-radius: 4px;">
+                                    SIMULASI PENUH ASLI (150 SOAL)
+                                </span>
+                                <span style="color: #94a3b8; font-size: 0.88rem;">Standar Resmi TOEFL ITP® (310 - 677)</span>
+                            </div>
+                            <h2>Simulasi Ujian TOEFL Asli (50 Soal per Bagian)</h2>
+                            <p>
+                                Format lengkap sesuai ujian TOEFL asli dengan total 150 butir soal: 50 Soal Listening Comprehension (Part A, B, C), 50 Soal Structure & Written Expression (Error Identification A, B, C, D), dan 50 Soal Reading Comprehension teks ilmiah.
+                            </p>
+                            <div style="margin-top: 22px; display: flex; gap: 14px; flex-wrap: wrap;">
+                                <button class="btn-modern btn-primary" id="btn-start-full-toefl">
+                                    Mulai Ujian Lengkap 150 Soal (Timed 115 Menit) ⏱️
+                                </button>
+                                <button class="btn-modern btn-outline" id="btn-quick-toefl-practice" style="border-color: rgba(255,255,255,0.3); color: #fff; background: transparent;">
+                                    Latihan Mandiri (Untimed)
+                                </button>
+                            </div>
+                        </div>
+
+                        <h3 style="font-size: 1.25rem; margin-bottom: 16px;">Pilihan Bagian Ujian (50 Soal Tiap Bagian)</h3>
+                        <div class="toefl-section-cards">
+                            <div class="toefl-sec-card">
+                                <div class="sec-icon">🎧</div>
+                                <h4>Section 1: Listening</h4>
+                                <span class="track-badge" style="margin-bottom: 8px; display: inline-block;">50 Soal • 35 Menit</span>
+                                <p>Percakapan singkat (Part A), dialog panjang (Part B), dan kuliah sains (Part C) dengan audio narasi penutur asli.</p>
+                                <button class="btn-modern btn-outline" style="width: 100%;" onclick="window.startToeflSection(0)">
+                                    Buka Sesi Listening (50 Soal)
+                                </button>
+                            </div>
+
+                            <div class="toefl-sec-card">
+                                <div class="sec-icon">✍️</div>
+                                <h4>Section 2: Structure</h4>
+                                <span class="track-badge" style="margin-bottom: 8px; display: inline-block;">50 Soal • 25 Menit</span>
+                                <p>25 soal melengkapi kalimat (Part A) dan 25 soal Error Identification kata bergaris bawah A, B, C, D (Part B).</p>
+                                <button class="btn-modern btn-outline" style="width: 100%;" onclick="window.startToeflSection(1)">
+                                    Buka Sesi Structure (50 Soal)
+                                </button>
+                            </div>
+
+                            <div class="toefl-sec-card">
+                                <div class="sec-icon">📖</div>
+                                <h4>Section 3: Reading</h4>
+                                <span class="track-badge" style="margin-bottom: 8px; display: inline-block;">50 Soal • 55 Menit</span>
+                                <p>5 teks bacaan ilmiah akademis (biologi, astronomi, sejarah, ekologi) dengan 50 pertanyaan mendalam.</p>
+                                <button class="btn-modern btn-outline" style="width: 100%;" onclick="window.startToeflSection(2)">
+                                    Buka Sesi Reading (50 Soal)
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Previous Test Scores History -->
+                        <div class="unit-syllabus-card" style="padding: 24px;">
+                            <h4 style="margin-bottom: 14px; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
+                                <span>📊</span> Riwayat Latihan Ujian TOEFL Terakhir
+                            </h4>
+                            <div id="toefl-history-container">
+                                <p style="color: var(--text-muted); font-size: 0.9rem; font-style: italic;">Belum ada data latihan. Selesaikan tes pertama Anda untuk melihat laporan skor.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Active Exam Simulator Runner -->
+                    <div id="toefl-exam-screen" style="display: none;">
+                        <div class="toefl-exam-wrapper">
+                            <div class="toefl-exam-top">
+                                <div>
+                                    <span id="toefl-current-section-name" style="font-weight: 700; font-size: 1rem;">
+                                        Section 1: Listening Comprehension
+                                    </span>
+                                </div>
+                                <div class="exam-timer-box">
+                                    <span>⏱️</span>
+                                    <span id="toefl-timer-display">25:00</span>
+                                </div>
+                            </div>
+
+                            <div class="exam-grid-palette" id="toefl-question-palette">
+                                <!-- Injected via JS -->
+                            </div>
+
+                            <div style="padding: 32px;">
+                                <!-- Reading Passage if in Section 3 -->
+                                <div id="toefl-reading-passage-box" style="display: none;" class="toefl-passage-container">
+                                    <h4 id="passage-title" style="margin-bottom: 10px; color: var(--primary);">Passage Title</h4>
+                                    <div id="passage-text" style="color: var(--text-secondary); white-space: pre-line; font-size: 0.94rem;">Passage content...</div>
+                                </div>
+
+                                <!-- Audio Lecture Box if in Section 1 -->
+                                <div id="toefl-audio-player-box" style="display: none; margin-bottom: 24px;">
+                                    <div class="audio-player-bar" style="width: 100%; justify-content: space-between;">
+                                        <div style="display: flex; align-items: center; gap: 12px;">
+                                            <button class="btn-audio-circle" id="btn-play-toefl-audio">▶</button>
+                                            <span style="font-size: 0.92rem; font-weight: 600;">Putar Audio Percakapan / Kuliah</span>
+                                        </div>
+                                        <button class="btn-modern btn-outline" id="btn-toggle-transcript" style="padding: 6px 12px; font-size: 0.84rem;">
+                                            Lihat Transkrip 📜
+                                        </button>
+                                    </div>
+                                    <p id="toefl-transcript-text" style="display: none; margin-top: 12px; font-size: 0.88rem; color: var(--text-secondary); background: var(--bg-surface-alt); padding: 14px; border-radius: var(--radius-sm); border: 1px solid var(--border-color);"></p>
+                                </div>
+
+                                <!-- Underlined Sentence for Section 2 Part B Error ID -->
+                                <div id="toefl-underlined-box" style="display: none; background: var(--bg-surface-alt); padding: 18px; border-radius: var(--radius-md); border-left: 3px solid var(--primary); margin-bottom: 20px; font-size: 1.08rem; line-height: 1.8;">
+                                    <!-- Rendered underlined text -->
+                                </div>
+
+                                <h3 id="toefl-question-prompt" style="font-size: 1.15rem; margin-bottom: 20px; line-height: 1.5;">
+                                    Question prompt...
+                                </h3>
+
+                                <div class="choice-grid" id="toefl-options-container">
+                                    <!-- Options injected via JS -->
+                                </div>
+
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 28px; padding-top: 18px; border-top: 1px solid var(--border-color);">
+                                    <button class="btn-modern btn-outline" id="btn-flag-question">
+                                        🚩 Tandai Soal (Flag)
+                                    </button>
+                                    <div style="display: flex; gap: 10px;">
+                                        <button class="btn-modern btn-outline" id="btn-prev-toefl" disabled>
+                                            ◀ Sebelumnya
+                                        </button>
+                                        <button class="btn-modern btn-primary" id="btn-next-toefl">
+                                            Berikutnya ▶
+                                        </button>
+                                        <button class="btn-modern btn-primary" id="btn-finish-toefl" style="display: none; background: var(--success);">
+                                            Selesaikan Ujian 🏁
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TOEFL Score Report & Explanations Screen -->
+                    <div id="toefl-result-screen" style="display: none;" class="result-report-card">
+                        <div class="report-hero">
+                            <span style="font-size: 2.8rem; display: block; margin-bottom: 8px;">🎓</span>
+                            <div class="cefr-badge-large" style="background: linear-gradient(135deg, #1e1b4b, #0f172a);">
+                                Skor TOEFL ITP: <span id="toefl-final-scaled-score" style="color: #38bdf8; margin-left: 8px;">580</span>
+                            </div>
+                            <h3 id="toefl-band-name" style="font-size: 1.35rem; margin-bottom: 6px;">High Intermediate (B2)</h3>
+                            <p style="color: var(--text-secondary); font-size: 0.95rem;">
+                                Estimasi Skor TOEFL iBT: <strong id="toefl-ibt-score" style="color: var(--primary);">85 / 120</strong>
+                            </p>
+                        </div>
+
+                        <!-- Section Score Breakdown Grid -->
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 24px;">
+                            <div style="background: var(--bg-surface-alt); padding: 14px; border-radius: var(--radius-md); text-align: center; border: 1px solid var(--border-color);">
+                                <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 700;">Listening</span>
+                                <div style="font-size: 1.45rem; font-weight: 800; color: var(--accent-cyan);" id="rep-toefl-s1">56</div>
+                            </div>
+                            <div style="background: var(--bg-surface-alt); padding: 14px; border-radius: var(--radius-md); text-align: center; border: 1px solid var(--border-color);">
+                                <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 700;">Structure</span>
+                                <div style="font-size: 1.45rem; font-weight: 800; color: var(--warning);" id="rep-toefl-s2">58</div>
+                            </div>
+                            <div style="background: var(--bg-surface-alt); padding: 14px; border-radius: var(--radius-md); text-align: center; border: 1px solid var(--border-color);">
+                                <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 700;">Reading</span>
+                                <div style="font-size: 1.45rem; font-weight: 800; color: var(--primary);" id="rep-toefl-s3">60</div>
+                            </div>
+                        </div>
+
+                        <div style="background: var(--primary-subtle); border-left: 3px solid var(--primary); padding: 14px; border-radius: var(--radius-sm); margin-bottom: 24px;">
+                            <h4 style="color: var(--primary); margin-bottom: 4px; font-size: 0.95rem;">💡 Evaluasi & Analisis:</h4>
+                            <p id="toefl-feedback-text" style="color: var(--text-secondary); font-size: 0.9rem;"></p>
+                        </div>
+
+                        <!-- Question Review & Explanations Filter -->
+                        <div style="margin-bottom: 24px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                                <h4 style="font-size: 1.05rem;">Pembahasan Butir Soal</h4>
+                                <div style="display: flex; gap: 8px;">
+                                    <button class="level-tab-btn active" id="btn-filter-all-ans">Semua Soal</button>
+                                    <button class="level-tab-btn" id="btn-filter-wrong-ans">Salah Saja</button>
+                                </div>
+                            </div>
+                            <div id="toefl-review-list-container" style="display: flex; flex-direction: column; gap: 12px;">
+                                <!-- Review items injected via JS -->
+                            </div>
+                        </div>
+
+                        <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+                            <button class="btn-modern btn-primary" id="btn-retake-toefl-fresh">
+                                🔄 Ulangi Ujian (Paket Soal Diacak Baru)
+                            </button>
+                            <button class="btn-modern btn-outline" id="btn-back-toefl-menu">
+                                Kembali ke Beranda TOEFL ➔
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ==========================================
+                     VIEW 4: VOCABULARY & FLASHCARDS
+                     ========================================== -->
+                <section class="view-panel" id="vocab-view">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
+                        <div>
+                            <h2>Kamus Kosakata & Flashcards</h2>
+                            <p style="color: var(--text-secondary); font-size: 0.94rem;">Pelajari kosakata penting dari level A1 hingga istilah akademik C1/TOEFL.</p>
+                        </div>
+                        <div class="level-tabs-bar" style="margin-bottom: 0;">
+                            <button class="level-tab-btn active" onclick="window.filterVocab('ALL')">Semua</button>
+                            <button class="level-tab-btn" onclick="window.filterVocab('A1')">A1</button>
+                            <button class="level-tab-btn" onclick="window.filterVocab('A2')">A2</button>
+                            <button class="level-tab-btn" onclick="window.filterVocab('B1')">B1</button>
+                            <button class="level-tab-btn" onclick="window.filterVocab('B2')">B2</button>
+                            <button class="level-tab-btn" onclick="window.filterVocab('C1')">C1 / TOEFL</button>
+                        </div>
+                    </div>
+
+                    <!-- Flashcard 3D Interactive Card -->
+                    <div class="flashcard-wrapper" id="flashcard-box" onclick="window.flipCard()">
+                        <div class="flashcard-inner" id="flashcard-inner">
+                            <div class="flashcard-face flashcard-front">
+                                <span class="exercise-category-tag" id="fc-level-badge" style="position: absolute; top: 20px; left: 24px;">CEFR B1</span>
+                                <button class="btn-audio-circle" style="position: absolute; top: 20px; right: 24px;" onclick="event.stopPropagation(); window.speakCurrentVocab();" title="Dengarkan Pengucapan">
+                                    🔊
+                                </button>
+                                <div class="card-word-title" id="fc-word">Opportunity</div>
+                                <div class="card-phonetic" id="fc-phonetic">/ˌɒp.əˈtjuː.nə.ti/</div>
+                                <span style="font-size: 0.88rem; color: var(--text-muted); font-weight: 600;" id="fc-type">Noun</span>
+                                <span style="margin-top: 24px; font-size: 0.82rem; color: var(--text-muted);">Klik kartu untuk melihat terjemahan & contoh kalimat</span>
+                            </div>
+                            <div class="flashcard-face flashcard-back">
+                                <div class="card-meaning" id="fc-meaning">Peluang / Kesempatan emas</div>
+                                <div class="card-example" id="fc-example">
+                                    "Studying abroad is a wonderful opportunity to grow."
+                                </div>
+                                <button class="btn-modern btn-outline" style="margin-top: 18px; font-size: 0.84rem;" onclick="event.stopPropagation(); window.toggleCardMastered();" id="btn-mastered-card">
+                                    ⭐ Tandai Sudah Hafal
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: center; align-items: center; gap: 20px;">
+                        <button class="btn-modern btn-outline" onclick="window.prevVocab()">
+                            ◀ Sebelumnya
+                        </button>
+                        <span style="font-weight: 700; color: var(--text-secondary); font-size: 0.92rem;" id="fc-counter">1 / 15</span>
+                        <button class="btn-modern btn-primary" onclick="window.nextVocab()">
+                            Berikutnya ▶
+                        </button>
+                    </div>
+                </section>
+
+                <!-- ==========================================
+                     VIEW 5: PROFILE & ANALYTICS
+                     ========================================== -->
+                <section class="view-panel" id="profile-view">
+                    <div class="profile-grid">
+                        <div class="profile-card">
+                            <div style="width: 72px; height: 72px; border-radius: var(--radius-full); background: var(--primary-subtle); color: var(--primary); font-size: 2rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px auto; font-weight: 800;">
+                                LS
+                            </div>
+                            <h3 style="font-size: 1.3rem;">Pelajar Aktif</h3>
+                            <p style="color: var(--text-muted); font-size: 0.86rem; margin-bottom: 14px;">Akun Akademik</p>
+                            <div class="exercise-category-tag" style="margin: 0 auto 20px auto;" id="profile-cefr-badge">
+                                CEFR B1 - Intermediate
+                            </div>
+
+                            <div style="text-align: left; border-top: 1px solid var(--border-color); padding-top: 16px;">
+                                <h4 style="margin-bottom: 12px; font-size: 0.95rem;">Metrik Pembelajaran</h4>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem;">
+                                    <span style="color: var(--text-secondary);">Konsistensi (Streak):</span>
+                                    <strong style="color: var(--warning);" id="prof-streak-count">1 Hari 🔥</strong>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem;">
+                                    <span style="color: var(--text-secondary);">Total Poin XP:</span>
+                                    <strong style="color: var(--primary);" id="prof-total-xp">0 XP</strong>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; font-size: 0.9rem;">
+                                    <span style="color: var(--text-secondary);">Kosakata Dikuasai:</span>
+                                    <strong style="color: var(--success);" id="prof-vocab-count">0 Kata</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="unit-syllabus-card" style="padding: 24px; margin-bottom: 24px;">
+                                <h3 style="margin-bottom: 14px; font-size: 1.15rem;">🎯 Sasaran Belajar Harian</h3>
+                                <div style="display: flex; justify-content: space-between; font-weight: 600; font-size: 0.9rem; margin-bottom: 8px;">
+                                    <span id="prof-daily-label">0 / 50 XP hari ini</span>
+                                    <span id="prof-daily-percent">0%</span>
+                                </div>
+                                <div class="exercise-progress-container">
+                                    <div class="exercise-progress-bar" id="prof-daily-progress" style="width: 0%;"></div>
+                                </div>
+                            </div>
+
+                            <div class="unit-syllabus-card" style="padding: 24px;">
+                                <h3 style="margin-bottom: 14px; font-size: 1.15rem;">🏅 Sertifikasi & Prestasi</h3>
+                                <div class="badge-collection">
+                                    <div class="badge-item">
+                                        <div class="icon">🌱</div>
+                                        <span>First Step</span>
+                                    </div>
+                                    <div class="badge-item">
+                                        <div class="icon">🔥</div>
+                                        <span>Streak Master</span>
+                                    </div>
+                                    <div class="badge-item">
+                                        <div class="icon">🎯</div>
+                                        <span>Diagnostic Tested</span>
+                                    </div>
+                                    <div class="badge-item">
+                                        <div class="icon">📝</div>
+                                        <span>TOEFL Fighter</span>
+                                    </div>
+                                    <div class="badge-item">
+                                        <div class="icon">💎</div>
+                                        <span>Vocabulary Pro</span>
+                                    </div>
+                                    <div class="badge-item">
+                                        <div class="icon">👑</div>
+                                        <span>English Master</span>
+                                    </div>
+                                </div>
+
+                                <div style="margin-top: 24px; text-align: right;">
+                                    <button class="btn-modern btn-outline" style="color: var(--danger); border-color: var(--danger-border);" onclick="window.confirmResetData()">
+                                        Reset Data Pembelajaran 🗑️
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- ====================================================================
+         EXERCISE SESSION MODAL (Clean EdTech Focus Workspace)
+         ==================================================================== -->
+    <div class="exercise-overlay" id="exercise-modal">
+        <div class="exercise-topbar">
+            <button class="btn-close-exercise" id="btn-exit-lesson" title="Tutup Sesi">✕</button>
+            <div class="exercise-progress-container">
+                <div class="exercise-progress-bar" id="lesson-progress-bar"></div>
+            </div>
+            <div style="font-size: 0.88rem; font-weight: 700; color: var(--primary);" id="session-counter-badge">
+                Latihan 1/5
+            </div>
+        </div>
+
+        <div class="exercise-main-content">
+            <span class="exercise-category-tag" id="exercise-heading">Latihan Tata Bahasa</span>
+
+            <!-- Prompt Card -->
+            <div class="prompt-card" id="exercise-prompt-bubble">
+                Prompt question goes here...
+            </div>
+
+            <!-- Audio Bar -->
+            <div id="exercise-audio-bar" style="display: none;" class="audio-player-bar">
+                <button class="btn-audio-circle" id="btn-exercise-audio" title="Dengarkan">🔊</button>
+                <button class="btn-modern btn-outline" id="btn-exercise-audio-slow" style="padding: 5px 12px; font-size: 0.8rem;">🐢 Kecepatan Lambat</button>
+                <span style="font-size: 0.88rem; color: var(--text-secondary); font-weight: 600;">Klik untuk mendengarkan audio rekaman</span>
+            </div>
+
+            <!-- Interaction Body -->
+            <div id="exercise-interaction-body">
+                <!-- Choice, Word Bank, or Matching rendered dynamically -->
+            </div>
+        </div>
+
+        <!-- Feedback & Action Bar -->
+        <div class="exercise-bottom-bar" id="exercise-bottom-bar">
+            <div class="feedback-info" id="feedback-info" style="display: none;">
+                <div class="feedback-icon" id="feedback-icon">✓</div>
+                <div class="feedback-text">
+                    <h4 id="feedback-title">Jawaban Benar</h4>
+                    <p id="feedback-tip">Penjelasan tata bahasa terperinci.</p>
+                </div>
+            </div>
+
+            <div style="margin-left: auto;">
+                <button class="btn-modern btn-primary" id="btn-exercise-action" disabled>
+                    Periksa Jawaban
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lesson Finished Modal -->
+    <div class="exercise-overlay" id="lesson-finish-modal" style="justify-content: center; align-items: center; background: rgba(0,0,0,0.6); backdrop-filter: blur(6px);">
+        <div style="background: var(--bg-surface); padding: 36px; border-radius: var(--radius-xl); text-align: center; max-width: 460px; width: 90%; box-shadow: var(--shadow-lg); border: 1px solid var(--border-color);">
+            <div style="width: 64px; height: 64px; border-radius: var(--radius-full); background: var(--success-subtle); color: var(--success); font-size: 1.8rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px auto; font-weight: 800;">
+                ✓
+            </div>
+            <h2 style="font-size: 1.6rem; color: var(--text-primary); margin-bottom: 6px;">Sesi Pembelajaran Selesai</h2>
+            <p style="color: var(--text-secondary); font-size: 0.94rem; margin-bottom: 24px;">Kemajuan materi telah berhasil dicatat ke profil Anda.</p>
+
+            <div style="display: flex; justify-content: center; gap: 16px; margin-bottom: 26px;">
+                <div style="background: var(--bg-surface-alt); padding: 14px 22px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                    <div style="font-size: 1.5rem; font-weight: 800; color: var(--warning);" id="finish-xp-val">+20 XP</div>
+                    <div style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted);">Poin Diperoleh</div>
+                </div>
+                <div style="background: var(--bg-surface-alt); padding: 14px 22px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                    <div style="font-size: 1.5rem; font-weight: 800; color: var(--primary);" id="finish-acc-val">100%</div>
+                    <div style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted);">Akurasi Jawaban</div>
+                </div>
+            </div>
+
+            <button class="btn-modern btn-primary" id="btn-finish-lesson-continue" style="width: 100%;">
+                Kembali ke Kurikulum ➔
+            </button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/audio.js"></script>
+    <script src="js/confetti.js"></script>
+    <script src="js/state.js"></script>
+    <script src="js/data/curriculum.js"></script>
+    <script src="js/data/placementTest.js"></script>
+    <script src="js/data/toeflData.js"></script>
+    <script src="js/data/vocabData.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
