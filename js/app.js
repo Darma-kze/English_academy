@@ -27,7 +27,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (viewId === 'path-view') renderLearningPath();
         else if (viewId === 'toefl-view') renderToeflDashboard();
-        else if (viewId === 'vocab-view') renderCurrentVocab();
+        else if (viewId === 'vocab-view') {
+            if (window.miniGamesCtrl) window.miniGamesCtrl.init();
+        }
         else if (viewId === 'profile-view') renderProfileStats();
     }
 
@@ -94,9 +96,34 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('top-streak-count').textContent = `${d.streak} Hari`;
         document.getElementById('top-xp-count').textContent = `${d.xp} XP`;
 
-        const maxLevel = Math.max(...d.unlockedLevels);
-        const levelCode = ['A1', 'A2', 'B1', 'B2', 'C1'][maxLevel - 1] || 'A1';
+        let levelCode = 'A1';
+        if (d.diagnosticResult && d.diagnosticResult.levelCode) {
+            levelCode = d.diagnosticResult.levelCode;
+        } else {
+            const completedIds = Object.keys(d.completedLessons || {});
+            let maxCompletedLevel = 1;
+            completedIds.forEach(id => {
+                if (id.startsWith('l5')) maxCompletedLevel = Math.max(maxCompletedLevel, 5);
+                else if (id.startsWith('l4')) maxCompletedLevel = Math.max(maxCompletedLevel, 4);
+                else if (id.startsWith('l3')) maxCompletedLevel = Math.max(maxCompletedLevel, 3);
+                else if (id.startsWith('l2')) maxCompletedLevel = Math.max(maxCompletedLevel, 2);
+            });
+            const codes = ['A1', 'A2', 'B1', 'B2', 'C1'];
+            levelCode = codes[maxCompletedLevel - 1] || 'A1';
+        }
         document.getElementById('top-cefr-badge').textContent = `Tingkat ${levelCode}`;
+
+        // Update Top Bar User Account Pill
+        const currentUser = window.appState.getCurrentUser();
+        const topAvatar = document.getElementById('top-user-avatar');
+        const topName = document.getElementById('top-user-name');
+        const topEmail = document.getElementById('top-user-email');
+        if (topAvatar) {
+            topAvatar.textContent = currentUser.avatarInitials;
+            topAvatar.style.background = currentUser.avatarColor;
+        }
+        if (topName) topName.textContent = currentUser.name;
+        if (topEmail) topEmail.textContent = currentUser.email;
     }
     window.appState.subscribe(updateTopBar);
     updateTopBar();
@@ -1070,87 +1097,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // ----------------------------------------------------------------
     // 7. VOCABULARY & FLASHCARDS CONTROLLER
     // ----------------------------------------------------------------
-    let filteredVocabList = [...window.VOCAB_DATA];
-    let currentVocabIdx = 0;
-
-    window.filterVocab = function(level) {
-        window.soundCtrl?.playClick();
-        if (level === 'ALL') {
-            filteredVocabList = [...window.VOCAB_DATA];
-        } else {
-            filteredVocabList = window.VOCAB_DATA.filter(v => v.level === level);
-        }
-        currentVocabIdx = 0;
-        document.querySelectorAll('#vocab-view .level-tab-btn').forEach(c => c.classList.remove('active'));
-        event.target.classList.add('active');
-        renderCurrentVocab();
-    };
-
-    window.flipCard = function() {
-        const inner = document.getElementById('flashcard-inner');
-        inner.classList.toggle('flipped');
-        window.soundCtrl?.playClick();
-    };
-
-    window.prevVocab = function() {
-        if (currentVocabIdx > 0) {
-            currentVocabIdx--;
-            renderCurrentVocab();
-        }
-    };
-
-    window.nextVocab = function() {
-        if (currentVocabIdx < filteredVocabList.length - 1) {
-            currentVocabIdx++;
-            renderCurrentVocab();
-        }
-    };
-
-    window.speakCurrentVocab = function() {
-        const v = filteredVocabList[currentVocabIdx];
-        if (v) window.speechCtrl.speak(v.word, false);
-    };
-
-    window.toggleCardMastered = function() {
-        const v = filteredVocabList[currentVocabIdx];
-        if (!v) return;
-        const isMastered = window.appState.toggleWordMastered(v.id);
-        const btn = document.getElementById('btn-mastered-card');
-        if (isMastered) {
-            window.soundCtrl?.playCorrect();
-            btn.textContent = '✅ Dikuasai (+3 XP)';
-            btn.style.color = 'var(--success)';
-        } else {
-            btn.textContent = '⭐ Tandai Sudah Hafal';
-            btn.style.color = 'var(--text-primary)';
-        }
-    };
-
+    // 7. ENGLISH MINIGAMES ARCADE INTEGRATION
     function renderCurrentVocab() {
-        const inner = document.getElementById('flashcard-inner');
-        inner.classList.remove('flipped');
-
-        if (filteredVocabList.length === 0) return;
-        const v = filteredVocabList[currentVocabIdx];
-
-        document.getElementById('fc-level-badge').textContent = `CEFR ${v.level}`;
-        document.getElementById('fc-word').textContent = v.word;
-        document.getElementById('fc-phonetic').textContent = v.phonetic;
-        document.getElementById('fc-type').textContent = v.type;
-        document.getElementById('fc-meaning').textContent = v.translation;
-        document.getElementById('fc-example').textContent = `"${v.example}"`;
-        document.getElementById('fc-counter').textContent = `${currentVocabIdx + 1} / ${filteredVocabList.length}`;
-
-        const isMastered = window.appState.isWordMastered(v.id);
-        const btn = document.getElementById('btn-mastered-card');
-        if (isMastered) {
-            btn.textContent = '✅ Dikuasai (+3 XP)';
-            btn.style.color = 'var(--success)';
-        } else {
-            btn.textContent = '⭐ Tandai Sudah Hafal';
-            btn.style.color = 'var(--text-primary)';
+        if (window.miniGamesCtrl) {
+            window.miniGamesCtrl.init();
         }
     }
+    window.renderCurrentVocab = renderCurrentVocab;
 
     // ----------------------------------------------------------------
     // 8. PROFILE & ANALYTICS CONTROLLER
@@ -1165,9 +1118,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (d.diagnosticResult) {
             diagBadge.textContent = `${d.diagnosticResult.title} (${d.diagnosticResult.score}/${d.diagnosticResult.total})`;
         } else {
-            const maxLvl = Math.max(...d.unlockedLevels);
-            const codes = ['A1', 'A2', 'B1', 'B2', 'C1'];
-            diagBadge.textContent = `CEFR ${codes[maxLvl - 1]} - Level ${maxLvl}`;
+            diagBadge.textContent = `Semua Tingkat Terbuka (A1 - C1)`;
         }
 
         const dailyGoal = d.dailyGoal || 50;
@@ -1177,6 +1128,21 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('prof-daily-label').textContent = `${currentDailyXP} / ${dailyGoal} XP hari ini`;
         document.getElementById('prof-daily-percent').textContent = `${dailyPct}%`;
         document.getElementById('prof-daily-progress').style.width = `${dailyPct}%`;
+
+        // Update Profile Account Card Details
+        const currentUser = window.appState.getCurrentUser();
+        const profAvatar = document.getElementById('prof-user-avatar');
+        const profName = document.getElementById('prof-user-name');
+        const profEmail = document.getElementById('prof-user-email');
+        const profCardEmail = document.getElementById('prof-card-email-label');
+
+        if (profAvatar) {
+            profAvatar.textContent = currentUser.avatarInitials;
+            profAvatar.style.background = currentUser.avatarColor;
+        }
+        if (profName) profName.textContent = currentUser.name;
+        if (profEmail) profEmail.textContent = currentUser.email;
+        if (profCardEmail) profCardEmail.textContent = currentUser.email;
     }
 
     window.confirmResetData = function() {
@@ -1190,6 +1156,522 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Initialize Default View
-    renderLearningPath();
+    // ----------------------------------------------------------------
+    // 9. AUTHENTICATION & PASSWORD MANAGEMENT CONTROLLER
+    // ----------------------------------------------------------------
+    const authModal = document.getElementById('auth-modal');
+    const authAlertBox = document.getElementById('auth-alert-box');
+    const btnOpenAuth = document.getElementById('btn-open-auth-modal');
+    const topUserPill = document.getElementById('top-user-pill');
+    const btnCloseAuth = document.getElementById('btn-close-auth-modal');
+
+    function showAuthAlert(message, isSuccess = false) {
+        if (!authAlertBox) return;
+        authAlertBox.style.display = 'block';
+        authAlertBox.style.background = isSuccess ? 'var(--success-subtle)' : 'var(--danger-subtle)';
+        authAlertBox.style.color = isSuccess ? 'var(--success)' : 'var(--danger)';
+        authAlertBox.style.border = `1px solid ${isSuccess ? 'var(--success-border)' : 'var(--danger-border)'}`;
+        authAlertBox.textContent = message;
+    }
+
+    function hideAuthAlert() {
+        if (authAlertBox) authAlertBox.style.display = 'none';
+    }
+
+    function openAuthModal(defaultTab = 'login') {
+        if (!authModal) return;
+        hideAuthAlert();
+        switchAuthTab(defaultTab);
+        authModal.style.display = 'flex';
+        window.soundCtrl?.playClick();
+    }
+
+    function closeAuthModal() {
+        if (!authModal) return;
+        authModal.style.display = 'none';
+        hideAuthAlert();
+    }
+
+    function switchAuthTab(tabName) {
+        hideAuthAlert();
+        document.querySelectorAll('.auth-tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.auth-form-panel').forEach(f => {
+            f.style.display = 'none';
+            f.classList.remove('active');
+        });
+
+        const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+        const activeForm = document.getElementById(`form-auth-${tabName}`);
+        const subtitle = document.getElementById('auth-modal-subtitle');
+
+        if (activeBtn) activeBtn.classList.add('active');
+        if (activeForm) {
+            activeForm.style.display = 'block';
+            activeForm.classList.add('active');
+        }
+
+        if (subtitle) {
+            if (tabName === 'login') {
+                subtitle.textContent = 'Masuk dengan akun email Anda untuk melanjutkan dan menyimpan seluruh progres pembelajaran.';
+            } else if (tabName === 'register') {
+                subtitle.textContent = 'Daftarkan akun email Anda secara gratis untuk mendapatkan kurikulum lengkap Level 1 s.d. Level 5.';
+            } else if (tabName === 'reset') {
+                subtitle.textContent = 'Atur ulang kata sandi akun email Anda dengan mudah dan aman.';
+            }
+        }
+    }
+
+    // Header User Profile Pill -> Go to Profile View
+    if (topUserPill) {
+        topUserPill.onclick = () => {
+            window.soundCtrl?.playClick();
+            switchView('profile-view');
+        };
+    }
+    if (btnOpenAuth) btnOpenAuth.onclick = () => openAuthModal('login');
+    if (btnCloseAuth) btnCloseAuth.onclick = closeAuthModal;
+
+    const btnProfSwitch = document.getElementById('btn-prof-switch-account');
+    if (btnProfSwitch) btnProfSwitch.onclick = () => openAuthModal('login');
+
+    const btnProfLogout = document.getElementById('btn-prof-logout');
+    if (btnProfLogout) {
+        btnProfLogout.onclick = () => {
+            const user = window.appState.getCurrentUser();
+            if (confirm(`Apakah Anda yakin ingin keluar dari akun ${user.email}?`)) {
+                window.appState.logout();
+                window.soundCtrl?.playClick();
+                openAuthModal('login');
+            }
+        };
+    }
+
+    // Close when clicking modal backdrop
+    if (authModal) {
+        authModal.onclick = (e) => {
+            if (e.target === authModal) closeAuthModal();
+        };
+    }
+
+    // Auth Tab buttons
+    document.querySelectorAll('.auth-tab-btn').forEach(btn => {
+        btn.onclick = () => {
+            window.soundCtrl?.playClick();
+            switchAuthTab(btn.dataset.authTab);
+        };
+    });
+
+    const linkForgot = document.getElementById('link-forgot-pwd');
+    if (linkForgot) {
+        linkForgot.onclick = () => {
+            window.soundCtrl?.playClick();
+            switchAuthTab('reset');
+        };
+    }
+
+    const linkBackLogin = document.getElementById('link-back-to-login');
+    if (linkBackLogin) {
+        linkBackLogin.onclick = () => {
+            window.soundCtrl?.playClick();
+            switchAuthTab('login');
+        };
+    }
+
+    // Quick demo account fill button
+    const btnFillDemo = document.getElementById('btn-fill-demo-account');
+    if (btnFillDemo) {
+        btnFillDemo.onclick = () => {
+            window.soundCtrl?.playClick();
+            document.getElementById('login-email').value = 'darma@gmail.com';
+            document.getElementById('login-password').value = 'password123';
+        };
+    }
+
+    // Eye toggle button handlers
+    document.querySelectorAll('.btn-toggle-eye').forEach(btn => {
+        btn.onclick = () => {
+            window.soundCtrl?.playClick();
+            const targetId = btn.dataset.target;
+            const input = document.getElementById(targetId);
+            if (!input) return;
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                btn.textContent = '🙈';
+            } else {
+                input.type = 'password';
+                btn.textContent = '👁️';
+            }
+        };
+    });
+
+    // Password strength calculations
+    function calculateStrength(pwd) {
+        if (!pwd || pwd.length < 6) return 'none';
+        let score = 0;
+        if (pwd.length >= 6) score++;
+        if (pwd.length >= 8) score++;
+        if (/[A-Z]/.test(pwd) || /[0-9]/.test(pwd)) score++;
+        if (/[^A-Za-z0-9]/.test(pwd)) score++;
+
+        if (score <= 1) return 'weak';
+        if (score === 2) return 'medium';
+        return 'strong';
+    }
+
+    const inputNewPwd = document.getElementById('input-new-pwd');
+    const profStrengthBar = document.getElementById('prof-pwd-strength-bar');
+    const profStrengthText = document.getElementById('prof-pwd-strength-text');
+
+    if (inputNewPwd && profStrengthBar && profStrengthText) {
+        inputNewPwd.oninput = () => {
+            const val = inputNewPwd.value;
+            const strength = calculateStrength(val);
+            profStrengthBar.className = `pwd-strength-bar ${strength}`;
+            if (strength === 'weak') {
+                profStrengthText.textContent = 'Lemah (Coba tambah angka/simbol)';
+                profStrengthText.style.color = 'var(--danger)';
+            } else if (strength === 'medium') {
+                profStrengthText.textContent = 'Sedang (Cukup baik)';
+                profStrengthText.style.color = 'var(--warning)';
+            } else if (strength === 'strong') {
+                profStrengthText.textContent = 'Kuat (Sangat aman)';
+                profStrengthText.style.color = 'var(--success)';
+            } else {
+                profStrengthText.textContent = 'Minimal 6 karakter';
+                profStrengthText.style.color = 'var(--text-muted)';
+            }
+        };
+    }
+
+    // 1. Submit Form Login
+    const formLogin = document.getElementById('form-auth-login');
+    if (formLogin) {
+        formLogin.onsubmit = () => {
+            const email = document.getElementById('login-email').value;
+            const pwd = document.getElementById('login-password').value;
+
+            const res = window.appState.login(email, pwd);
+            if (res.success) {
+                window.soundCtrl?.playFanfare();
+                showAuthAlert(res.message, true);
+                setTimeout(() => {
+                    closeAuthModal();
+                    updateTopBar();
+                    renderProfileStats();
+                    renderLearningPath();
+                }, 500);
+            } else {
+                window.soundCtrl?.playWrong();
+                showAuthAlert(res.message, false);
+            }
+        };
+    }
+
+    // 2. Submit Form Register
+    const formRegister = document.getElementById('form-auth-register');
+    if (formRegister) {
+        formRegister.onsubmit = () => {
+            const name = document.getElementById('reg-name').value;
+            const email = document.getElementById('reg-email').value;
+            const pwd = document.getElementById('reg-password').value;
+            const confirmPwd = document.getElementById('reg-confirm-password').value;
+
+            if (pwd !== confirmPwd) {
+                window.soundCtrl?.playWrong();
+                showAuthAlert('Konfirmasi kata sandi tidak cocok dengan kata sandi baru!', false);
+                return;
+            }
+
+            const res = window.appState.register(name, email, pwd);
+            if (res.success) {
+                window.soundCtrl?.playFanfare();
+                window.confetti?.fire(80);
+                showAuthAlert(res.message, true);
+                setTimeout(() => {
+                    closeAuthModal();
+                    updateTopBar();
+                    renderProfileStats();
+                    renderLearningPath();
+                }, 700);
+            } else {
+                window.soundCtrl?.playWrong();
+                showAuthAlert(res.message, false);
+            }
+        };
+    }
+
+    // 3. Submit Form Reset Password
+    const formReset = document.getElementById('form-auth-reset');
+    if (formReset) {
+        formReset.onsubmit = () => {
+            const email = document.getElementById('reset-email').value;
+            const newPwd = document.getElementById('reset-new-password').value;
+            const confirmPwd = document.getElementById('reset-confirm-password').value;
+
+            if (newPwd !== confirmPwd) {
+                window.soundCtrl?.playWrong();
+                showAuthAlert('Konfirmasi kata sandi tidak cocok!', false);
+                return;
+            }
+
+            const res = window.appState.resetPassword(email, newPwd);
+            if (res.success) {
+                window.soundCtrl?.playCorrect();
+                showAuthAlert(res.message, true);
+                setTimeout(() => {
+                    switchAuthTab('login');
+                    document.getElementById('login-email').value = email;
+                    document.getElementById('login-password').value = newPwd;
+                    showAuthAlert('Kata sandi berhasil diatur ulang! Silakan klik Masuk.', true);
+                }, 800);
+            } else {
+                window.soundCtrl?.playWrong();
+                showAuthAlert(res.message, false);
+            }
+        };
+    }
+
+    // 4. Change Password Form (Inside Profile View)
+    const formChangePwd = document.getElementById('form-change-password');
+    const profPwdAlert = document.getElementById('prof-pwd-alert');
+
+    function showProfPwdAlert(msg, isSuccess = false) {
+        if (!profPwdAlert) return;
+        profPwdAlert.style.display = 'block';
+        profPwdAlert.style.background = isSuccess ? 'var(--success-subtle)' : 'var(--danger-subtle)';
+        profPwdAlert.style.color = isSuccess ? 'var(--success)' : 'var(--danger)';
+        profPwdAlert.style.border = `1px solid ${isSuccess ? 'var(--success-border)' : 'var(--danger-border)'}`;
+        profPwdAlert.textContent = msg;
+    }
+
+    if (formChangePwd) {
+        formChangePwd.onsubmit = () => {
+            const currPwd = document.getElementById('input-curr-pwd').value;
+            const newPwd = document.getElementById('input-new-pwd').value;
+            const confirmPwd = document.getElementById('input-confirm-new-pwd').value;
+
+            if (newPwd !== confirmPwd) {
+                window.soundCtrl?.playWrong();
+                showProfPwdAlert('Konfirmasi kata sandi tidak cocok dengan kata sandi baru!', false);
+                return;
+            }
+
+            const res = window.appState.changePassword(currPwd, newPwd);
+            if (res.success) {
+                window.soundCtrl?.playCorrect();
+                showProfPwdAlert(res.message, true);
+                document.getElementById('input-curr-pwd').value = '';
+                document.getElementById('input-new-pwd').value = '';
+                document.getElementById('input-confirm-new-pwd').value = '';
+                if (profStrengthBar) profStrengthBar.className = 'pwd-strength-bar';
+                if (profStrengthText) profStrengthText.textContent = 'Kekuatan Sandi';
+            } else {
+                window.soundCtrl?.playWrong();
+                showProfPwdAlert(res.message, false);
+            }
+        };
+    }
+    // ----------------------------------------------------------------
+    // 10. FULL-SCREEN LOGIN GATEWAY CONTROLLER
+    // ----------------------------------------------------------------
+    const loginScreen = document.getElementById('login-screen');
+    const appWorkspace = document.getElementById('app-workspace');
+    const gateAlertBox = document.getElementById('gate-auth-alert-box');
+
+    function showGateAlert(message, isSuccess = false) {
+        if (!gateAlertBox) return;
+        gateAlertBox.style.display = 'block';
+        gateAlertBox.style.background = isSuccess ? 'var(--success-subtle)' : 'var(--danger-subtle)';
+        gateAlertBox.style.color = isSuccess ? 'var(--success)' : 'var(--danger)';
+        gateAlertBox.style.border = `1px solid ${isSuccess ? 'var(--success-border)' : 'var(--danger-border)'}`;
+        gateAlertBox.textContent = message;
+    }
+
+    function hideGateAlert() {
+        if (gateAlertBox) gateAlertBox.style.display = 'none';
+    }
+
+    function switchGateAuthTab(tabName) {
+        hideGateAlert();
+        document.querySelectorAll('#login-screen .auth-tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('#login-screen .auth-form-panel').forEach(f => {
+            f.style.display = 'none';
+            f.classList.remove('active');
+        });
+
+        const activeBtn = document.getElementById(`gate-tab-btn-${tabName}`);
+        const activeForm = document.getElementById(`form-gate-${tabName}`);
+        const gateTitle = document.getElementById('auth-gate-title');
+        const gateDesc = document.getElementById('auth-gate-desc');
+
+        if (activeBtn) activeBtn.classList.add('active');
+        if (activeForm) {
+            activeForm.style.display = 'block';
+            activeForm.classList.add('active');
+        }
+
+        if (gateTitle && gateDesc) {
+            if (tabName === 'login') {
+                gateTitle.textContent = 'Selamat Datang!';
+                gateDesc.textContent = 'Silakan masuk dengan alamat email Anda untuk mulai belajar.';
+            } else if (tabName === 'register') {
+                gateTitle.textContent = 'Buat Akun Baru';
+                gateDesc.textContent = 'Daftarkan email Anda untuk membuka kurikulum Level 1 s.d. Level 5 secara gratis.';
+            } else if (tabName === 'reset') {
+                gateTitle.textContent = 'Lupa Kata Sandi';
+                gateDesc.textContent = 'Atur ulang kata sandi akun email Anda dengan cepat dan aman.';
+            }
+        }
+    }
+
+    function checkAuthGate() {
+        const isAuth = window.appState.isAuthenticated();
+        if (isAuth) {
+            if (loginScreen) loginScreen.style.display = 'none';
+            if (appWorkspace) appWorkspace.style.display = 'flex';
+            renderLearningPath();
+            updateTopBar();
+            renderProfileStats();
+        } else {
+            if (loginScreen) loginScreen.style.display = 'flex';
+            if (appWorkspace) appWorkspace.style.display = 'none';
+            switchGateAuthTab('login');
+        }
+    }
+
+    // Gate Tab Buttons
+    document.querySelectorAll('#login-screen .auth-tab-btn').forEach(btn => {
+        btn.onclick = () => {
+            window.soundCtrl?.playClick();
+            switchGateAuthTab(btn.dataset.authTab);
+        };
+    });
+
+    const gateLinkForgot = document.getElementById('gate-link-forgot-pwd');
+    if (gateLinkForgot) {
+        gateLinkForgot.onclick = () => {
+            window.soundCtrl?.playClick();
+            switchGateAuthTab('reset');
+        };
+    }
+
+    const gateLinkBackLogin = document.getElementById('gate-link-back-login');
+    if (gateLinkBackLogin) {
+        gateLinkBackLogin.onclick = () => {
+            window.soundCtrl?.playClick();
+            switchGateAuthTab('login');
+        };
+    }
+
+    // Gate Quick Demo Button
+    const btnGateFillDemo = document.getElementById('btn-gate-fill-demo');
+    if (btnGateFillDemo) {
+        btnGateFillDemo.onclick = () => {
+            window.soundCtrl?.playClick();
+            const emailInput = document.getElementById('gate-login-email');
+            const pwdInput = document.getElementById('gate-login-password');
+            if (emailInput) emailInput.value = 'darma@gmail.com';
+            if (pwdInput) pwdInput.value = 'password123';
+        };
+    }
+
+    // Gate Login Submission
+    const formGateLogin = document.getElementById('form-gate-login');
+    if (formGateLogin) {
+        formGateLogin.onsubmit = () => {
+            const email = document.getElementById('gate-login-email').value;
+            const pwd = document.getElementById('gate-login-password').value;
+
+            const res = window.appState.login(email, pwd);
+            if (res.success) {
+                window.soundCtrl?.playFanfare();
+                showGateAlert(res.message, true);
+                setTimeout(() => {
+                    checkAuthGate();
+                }, 600);
+            } else {
+                window.soundCtrl?.playWrong();
+                showGateAlert(res.message, false);
+            }
+        };
+    }
+
+    // Gate Register Submission
+    const formGateRegister = document.getElementById('form-gate-register');
+    if (formGateRegister) {
+        formGateRegister.onsubmit = () => {
+            const name = document.getElementById('gate-reg-name').value;
+            const email = document.getElementById('gate-reg-email').value;
+            const pwd = document.getElementById('gate-reg-password').value;
+            const confirmPwd = document.getElementById('gate-reg-confirm-password').value;
+
+            if (pwd !== confirmPwd) {
+                window.soundCtrl?.playWrong();
+                showGateAlert('Konfirmasi kata sandi tidak cocok!', false);
+                return;
+            }
+
+            const res = window.appState.register(name, email, pwd);
+            if (res.success) {
+                window.soundCtrl?.playFanfare();
+                window.confetti?.fire(90);
+                showGateAlert(res.message, true);
+                setTimeout(() => {
+                    checkAuthGate();
+                }, 700);
+            } else {
+                window.soundCtrl?.playWrong();
+                showGateAlert(res.message, false);
+            }
+        };
+    }
+
+    // Gate Reset Password Submission
+    const formGateReset = document.getElementById('form-gate-reset');
+    if (formGateReset) {
+        formGateReset.onsubmit = () => {
+            const email = document.getElementById('gate-reset-email').value;
+            const newPwd = document.getElementById('gate-reset-new-password').value;
+            const confirmPwd = document.getElementById('gate-reset-confirm-password').value;
+
+            if (newPwd !== confirmPwd) {
+                window.soundCtrl?.playWrong();
+                showGateAlert('Konfirmasi kata sandi tidak cocok!', false);
+                return;
+            }
+
+            const res = window.appState.resetPassword(email, newPwd);
+            if (res.success) {
+                window.soundCtrl?.playCorrect();
+                showGateAlert(res.message, true);
+                setTimeout(() => {
+                    switchGateAuthTab('login');
+                    const loginEmail = document.getElementById('gate-login-email');
+                    const loginPwd = document.getElementById('gate-login-password');
+                    if (loginEmail) loginEmail.value = email;
+                    if (loginPwd) loginPwd.value = newPwd;
+                    showGateAlert('Kata sandi berhasil direset! Silakan klik Masuk.', true);
+                }, 750);
+            } else {
+                window.soundCtrl?.playWrong();
+                showGateAlert(res.message, false);
+            }
+        };
+    }
+
+    // Override Profile Logout to route back to Login Screen
+    if (btnProfLogout) {
+        btnProfLogout.onclick = () => {
+            const user = window.appState.getCurrentUser();
+            if (confirm(`Apakah Anda yakin ingin keluar dari akun ${user.email}?`)) {
+                window.appState.logout();
+                window.soundCtrl?.playClick();
+                checkAuthGate();
+            }
+        };
+    }
+
+    // Initialize View based on Auth Gate Status
+    checkAuthGate();
 });
